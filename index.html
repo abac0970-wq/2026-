@@ -11,7 +11,125 @@
 <body class="bg-slate-50">
     <div id="root"></div>
     <script type="text/babel">
-        // 這裡貼入我們之前做好的 React 代碼
+        // <!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>補習班帳務管理系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // --- 內建圖示組件 ---
+        const Icon = ({ name }) => {
+            const icons = {
+                spreadsheet: <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/><path d="M10 13v4"/><path d="M16 13v4"/>,
+                trending: <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>,
+                trash: <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>,
+                chart: <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+            };
+            return (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {icons[name] || <circle cx="12" cy="12" r="10" />}
+                </svg>
+            );
+        };
+
+        const App = () => {
+            const [activeMonth, setActiveMonth] = useState(2);
+            const [data, setData] = useState([
+                { month: '一月', items: [
+                    { id: 1, category: '安親', name: '安親費用', income: 148735, expense: 0, note: '核心收入' },
+                    { id: 2, category: '才藝', name: '舞蹈班', income: 22400, expense: 0, note: '' },
+                    { id: 3, category: '才藝', name: '美術班', income: 17500, expense: 0, note: '5人' }
+                ]},
+                { month: '二月', items: [
+                    { id: 4, category: '安親', name: '安親費用', income: 198065, expense: 0, note: '學期高峰' },
+                    { id: 5, category: '才藝', name: '舞蹈班', income: 22905, expense: 12465, note: '蔡老師' },
+                    { id: 6, category: '才藝', name: '立體造型', income: 16800, expense: 12740, note: '謝老師' }
+                ]},
+                { month: '三月', items: [
+                    { id: 10, category: '語言', name: '生活美語(學費)', income: 42350, expense: 6200, note: 'Lynn老師' },
+                    { id: 11, category: '語言', name: '生活美語(教材)', income: 9100, expense: 8009, note: '含提袋運費' },
+                    { id: 12, category: '語言', name: '音樂美語', income: 26000, expense: 4500, note: '貝貝+Minnie' },
+                    { id: 13, category: '才藝', name: '舞蹈班', income: 25345, expense: 19185, note: '蔡老師' },
+                    { id: 16, category: '語言', name: '兒童美語', income: 0, expense: 12000, note: '待結帳' }
+                ]}
+            ]);
+
+            const current = data[activeMonth];
+            const stats = useMemo(() => {
+                const inc = current.items.reduce((a, b) => a + b.income, 0);
+                const exp = current.items.reduce((a, b) => a + b.expense, 0);
+                return { inc, exp, profit: inc - exp };
+            }, [current]);
+
+            return (
+                <div className="p-4 md:p-8 max-w-5xl mx-auto">
+                    <h1 className="text-3xl font-bold mb-6 text-slate-800">補習班帳務系統</h1>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <p className="text-slate-500 text-sm">收入</p>
+                            <p className="text-xl font-bold text-emerald-600">${stats.inc.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <p className="text-slate-500 text-sm">支出</p>
+                            <p className="text-xl font-bold text-rose-500">${stats.exp.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                            <p className="text-slate-500 text-sm">結餘</p>
+                            <p className="text-xl font-bold text-slate-800">${stats.profit.toLocaleString()}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2 mb-6">
+                        {data.map((m, idx) => (
+                            <button key={m.month} onClick={() => setActiveMonth(idx)} 
+                                className={`px-6 py-2 rounded-lg font-bold ${activeMonth === idx ? 'bg-slate-800 text-white' : 'bg-white text-slate-500'}`}>
+                                {m.month}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="px-6 py-3 text-xs font-bold text-slate-400">項目</th>
+                                    <th className="px-6 py-3 text-xs font-bold text-slate-400 text-right">收入</th>
+                                    <th className="px-6 py-3 text-xs font-bold text-slate-400 text-right">支出</th>
+                                    <th className="px-6 py-3 text-xs font-bold text-slate-400">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {current.items.map(item => (
+                                    <tr key={item.id}>
+                                        <td className="px-6 py-4 text-sm font-bold">{item.name}</td>
+                                        <td className="px-6 py-4 text-right text-sm text-emerald-600 font-bold">${item.income.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-right text-sm text-rose-500 font-bold">${item.expense.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-xs text-slate-400 italic">{item.note}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
         // (為了長度縮減，這裡先放組件框架，你可以直接貼入我之前給你的完整 App 代碼)
         const App = () => {
             return <div className="p-10 text-center text-2xl font-bold">帳務系統載入中...</div>;
